@@ -2,6 +2,8 @@ package com.example.todo.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -10,6 +12,7 @@ public class ToDo {
 
     private String id;
 
+    @NotNull
     private String description;
 
     private LocalDateTime created;

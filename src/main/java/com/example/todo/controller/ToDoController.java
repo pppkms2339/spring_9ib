@@ -4,8 +4,10 @@ import com.example.todo.entity.ToDo;
 import com.example.todo.repository.CommonRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
@@ -23,8 +25,11 @@ public class ToDoController {
         return ResponseEntity.ok(repository.findAll());
     }
 
-    @PostMapping("/todo")
-    public ResponseEntity<ToDo> save(@RequestBody ToDo entity) {
+    @RequestMapping(value = "/todo", method = {RequestMethod.POST, RequestMethod.PUT})
+    public ResponseEntity<?> save(@RequestBody @Valid ToDo entity, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(repository.save(entity));
     }
@@ -37,6 +42,16 @@ public class ToDoController {
     @GetMapping("/todo")
     public ResponseEntity<ToDo> findById2(@RequestParam String id) {
         return ResponseEntity.ok(repository.findById(id));
+    }
+
+    @DeleteMapping("/todo")
+    public ResponseEntity<?> delete(@RequestParam String id) {
+        ToDo toDoFromDb = repository.findById(id);
+        if (toDoFromDb == null) {
+            return ResponseEntity.notFound().build();
+        }
+        repository.delete(toDoFromDb);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

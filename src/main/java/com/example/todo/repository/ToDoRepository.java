@@ -17,7 +17,9 @@ public class ToDoRepository implements CommonRepository<ToDo> {
     public ToDo save(ToDo entity) {
         ToDo toDoFromDb = findById(entity.getId());
         if (toDoFromDb != null) {
-            toDoFromDb.setDescription(entity.getDescription());
+            if (entity.getDescription() != null) {
+                toDoFromDb.setDescription(entity.getDescription());
+            }
             toDoFromDb.setCompleted(entity.isCompleted());
             toDoFromDb.setUpdated(LocalDateTime.now());
             toDos.put(toDoFromDb.getId(), toDoFromDb);
