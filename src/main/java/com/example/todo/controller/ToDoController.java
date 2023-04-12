@@ -1,27 +1,27 @@
 package com.example.todo.controller;
 
 import com.example.todo.entity.ToDo;
-import com.example.todo.repository.CommonRepository;
+import com.example.todo.repository.ToDoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class ToDoController {
 
-    private CommonRepository<ToDo> repository;
+    private ToDoRepository repository;
 
-    public ToDoController(CommonRepository<ToDo> repository) {
+    public ToDoController(ToDoRepository repository) {
         this.repository = repository;
     }
 
     @GetMapping("/todos")
-    public ResponseEntity<Collection<ToDo>> findAll() {
+    public ResponseEntity<Iterable<ToDo>> findAll() {
         return ResponseEntity.ok(repository.findAll());
     }
 
@@ -36,21 +36,31 @@ public class ToDoController {
 
     @GetMapping("/todo/{id}")
     public ResponseEntity<ToDo> findById(@PathVariable String id) {
-        return ResponseEntity.ok(repository.findById(id));
+        Optional<ToDo> toDoOpt = repository.findById(id);
+        if (toDoOpt.isPresent()) {
+            return ResponseEntity.ok(toDoOpt.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/todo")
     public ResponseEntity<ToDo> findById2(@RequestParam String id) {
-        return ResponseEntity.ok(repository.findById(id));
+        Optional<ToDo> toDoOpt = repository.findById(id);
+        if (toDoOpt.isPresent()) {
+            return ResponseEntity.ok(toDoOpt.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/todo")
     public ResponseEntity<?> delete(@RequestParam String id) {
-        ToDo toDoFromDb = repository.findById(id);
-        if (toDoFromDb == null) {
+        Optional<ToDo> toDoOpt = repository.findById(id);
+        if (toDoOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        repository.delete(toDoFromDb);
+        repository.delete(toDoOpt.get());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

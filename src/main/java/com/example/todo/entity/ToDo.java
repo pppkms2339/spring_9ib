@@ -1,15 +1,22 @@
 package com.example.todo.entity;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.validation.constraints.Email;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
+@Entity
+@NoArgsConstructor
+@Table(name = "todo")
 public class ToDo {
 
+    @Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String id;
 
     @NotNull
@@ -19,12 +26,18 @@ public class ToDo {
 
     private LocalDateTime updated;
 
+    @Column(name = "COMPLETED") // алиас
     private boolean completed;
 
-    public ToDo() {
-        this.id = UUID.randomUUID().toString();
+    @PrePersist
+    public void onCreate() {
         this.created = LocalDateTime.now();
-        this.updated = this.created;
+        this.updated = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updated = LocalDateTime.now();
     }
 
 }
