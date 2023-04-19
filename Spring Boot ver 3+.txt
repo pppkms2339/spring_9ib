@@ -1,0 +1,23 @@
+В проекте Spring Boot версии 3+ уже добавили поддержку SQLite. Поэтому файл SQLDialect не нужен. Нуже бин:
+
+@Autowired Environment env;
+
+@Bean
+public DataSource dataSource() {
+    final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+    dataSource.setDriverClassName(env.getProperty("driverClassName"));
+    dataSource.setUrl(env.getProperty("url"));
+    return dataSource;
+}
+
+В application.properties:
+
+driverClassName=org.sqlite.JDBC
+url=jdbc:sqlite:memory:myDb?cache=shared 
+spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+
+Всё остальное можно оставлять/добавлять... url можно переписать:
+
+url=jdbc:sqlite:demo.db
+
+Тогда создается база данных в папке с проектом. 
